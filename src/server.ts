@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import { Request, Response } from 'express';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
 (async () => {
@@ -33,12 +34,28 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/filteredimage", async ( req, res ) => {
-    let reqimage_url = String(req.query.image_url)
-    let image_file = await filterImageFromURL(reqimage_url)
-    res.send(image_file);
+  app.get("/filteredimage", async (req:Request, res:Response) => {
+    let reqimage_url = String(req.query.image_url);
+    let image_path = await filterImageFromURL(reqimage_url);
+    res.sendFile(image_path);
 
-  })
+    if (res.statusCode == 200) {
+    
+      console.info('Successful');
+     }
+
+     if (res.statusCode == 404){
+      console.error("Failed to read file")
+     }
+     res.on("finish", () => {
+       deleteLocalFiles([image_path])
+     });
+     
+     
+
+      
+    
+  });
   
 
   // Start the Server
