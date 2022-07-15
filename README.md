@@ -28,20 +28,37 @@ We've included a few helper functions to handle some of these concepts and we're
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/filteredimage", async ( req, res ) => {
-    let reqimage_url = String(req.query.image_url)
-    let image_file = await filterImageFromURL(reqimage_url)
-    res.send(image_file);
+   
+  app.get("/filteredimage", async (req:Request, res:Response) => {
+    let reqimage_url = String(req.query.image_url);
+    let image_path = await filterImageFromURL(reqimage_url);
+    res.sendFile(image_path);
 
-  })
+    if (res.statusCode == 200) {
+    
+      console.info('Successful');
+     }
+
+     if (res.statusCode == 404){
+      console.error("Failed to read file")
+     }
+     res.on("finish", () => {
+       deleteLocalFiles([image_path])
+     });
+     
+     
+
+      
+    
+  });
+
 ```
 
 ### Deploying your system
 
 Follow the process described in the course to `eb init` a new application and `eb create` a new environment to deploy your image-filter service! Don't forget you can use `eb deploy` to push changes.
 
-## ElasticBeanStalk_URL: http://image-filter-starter-code-dev22222222222222222222222.us-east-1.elasticbeanstalk.com/filteredimage?image_url=https://avatars.githubusercontent.com/u/25362080?s=400&u=d8e15dc94f8cf4badd0ce69765003faa73409fb2&v=4
-
+## ElasticBeanStalk_URL: mage-filter-starter-code-dev22.us-east-1.elasticbeanstalk.com/filteredimage?image_url=https://avatars.githubusercontent.com/u/25362080?s=400&u=d8e15dc94f8cf4badd0ce69765003faa73409fb2&v=4
 ## Stand Out (Optional)
 
 ### Refactor the course RESTapi
